@@ -1,0 +1,10 @@
+--- #DEPLOY PACKAGE PLAYBOOK
+- hosts: app
+  user: deploy
+  sudo: yes
+  gather_facts: no
+  connection: ssh
+  tasks:
+  - name: copy files to app server
+    action: copy src=/var/lib/jenkins/workspace/GradleWrapperProject/web/build/libs/web.war dest=/opt/wildfly/standalone/deployments owner=wildfly group=wildfly
+

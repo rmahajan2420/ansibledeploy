@@ -1,0 +1,27 @@
+- name: Create wildfly user
+  user: name=wildfly state=present
+- name: Download the Wildfly Package
+  get_url: url=http://download.jboss.org/wildfly/8.0.0.Final/wildfly-8.0.0.Final.tar.gz dest=/opt owner=wildfly group=wildfly
+- name: unarchive the wildfly
+  unarchive: src=/opt/wildfly-8.0.0.Final.tar.gz dest=/opt copy=no owner=wildfly group=wildfly
+- name: Create a Symlink to Wildly  
+  file: src=/opt/wildfly-8.0.0.Final/ dest=/opt/wildfly owner=wildfly group=wildfly state=link
+- name: Copy the the file to the Init.d Wildfly to /etc/init.d
+  command: "{{ item }}"
+  with_items:
+    - cp /opt/wildfly/bin/init.d/wildfly-init-redhat.sh /etc/init.d/wildfly
+    - cp /opt/wildfly/bin/init.d/wildfly.conf /etc/default
+- name: Create a Wildfly log diry  
+  file: path=/var/log/wildfly owner=wildfly group=wildfly state=directory
+- name: Edit wildfly.conf file 
+  lineinfile: dest=/etc/default/wildfly.conf line="JBOSS_USER=wildfly"
+- name: Edit wildfly.conf file 
+  lineinfile: dest=/etc/default/wildfly.conf line="JBOSS_HOME=/opt/wildfly"
+- name: Edit wildfly.conf file 
+  lineinfile: dest=/etc/default/wildfly.conf line="JBOSS_MODE=standalone"
+- name: Edit wildfly.conf file 
+  lineinfile: dest=/etc/default/wildfly.conf line="JBOSS_CONSOLE_LOG=/var/log/wildfly/console.log"
+- name: Edit wildfly.conf file 
+  lineinfile: dest=/etc/default/wildfly.conf regexp='^<inet-address value="${jboss.bind.address.management:127.0.0.1}"/>' line='<inet-address value="${jboss.bind.address.management:0.0.0.0}"/>'
+- name: Restart the wildfly
+  command: /etc/init.d/wildfly restart
