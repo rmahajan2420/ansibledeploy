@@ -5,16 +5,22 @@
   get_url: url=http://download.jboss.org/wildfly/8.0.0.Final/wildfly-8.0.0.Final.tar.gz dest=/opt owner=wildfly group=wildfly
 
 - name: unarchive the wildfly
-  unarchive: src=/opt/wildfly-8.0.0.Final.tar.gz dest=/opt copy=no owner=wildfly group=wildfly
+  unarchive: src=/opt/wildfly-8.0.0.Final.tar.gz dest=/opt copy=noowner=wildfly group=wildfly creates=/opt/wildfly-8.0.0.Final/
 
 - name: Create a Symlink to Wildly  
   file: src=/opt/wildfly-8.0.0.Final/ dest=/opt/wildfly owner=wildfly group=wildfly state=link
 
-- name: Copy the the file to the Init.d Wildfly to /etc/init.d
-  command: "{{ item }}"
-  with_items:
-    - cp /opt/wildfly/bin/init.d/wildfly-init-redhat.sh /etc/init.d/wildfly
-    - cp /opt/wildfly/bin/init.d/wildfly.conf /etc/default
+# - name: Copy the the file to the Init.d Wildfly to /etc/init.d
+#  command: "{{ item }}"
+#  with_items:
+#    - cp /opt/wildfly/bin/init.d/wildfly-init-redhat.sh /etc/init.d/wildfly creates=/etc/init.d/wildfly/
+#    - cp /opt/wildfly/bin/init.d/wildfly.conf /etc/default creates=/etc/default/wildfly.conf/
+#
+- name: Copy the Init.d file to INit.d Dir
+  command: cp /opt/wildfly/bin/init.d/wildfly-init-redhat.sh /etc/init.d/wildfly creates=/etc/init.d/wildfly
+
+- name: Copy the default file
+  command: cp /opt/wildfly/bin/init.d/wildfly.conf /etc/default creates=/etc/default/wildfly.conf
 
 - name: Create a Wildfly log diry  
   file: path=/var/log/wildfly owner=wildfly group=wildfly state=directory
